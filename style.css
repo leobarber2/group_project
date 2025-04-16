@@ -1,0 +1,12 @@
+#root{
+    /* border:solid .5px; */
+    margin:auto;
+}
+
+/* define more CSS styles here */
+
+#root > div {
+    float: left;
+    border: solid 0.5px;
+    box-sizing: border-box;
+}
