@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Project</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="tooltip" style="position: absolute; display: none; background: lightgray; padding: 5px; border-radius: 5px;"></div>
+    <div id="scatterplot-container"></div>
+
+    <select id="y-axis-select">
+        <option value="attack">Attack</option>
+        <option value="hp">HP</option>
+        <option value="defense">Defense</option>
+        <option value="speed">Speed</option>
+    </select>
+
+    <script>
+d3.csv("pokemon_competitive_analysis.csv").then(data => {
+    const width = 1000, height = 1000, margin = { top: 50, right: 50, bottom: 50, left: 50 };
+
+    const svg = d3.select("#scatterplot-container").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    const xScale = d3.scaleLinear()
+        .domain([0, d3.max(data, d => +d.hp)]) // hp stat
+        .range([margin.left, width - margin.right]);
+    let yScale = d3.scaleLinear()
+        .domain([0, d3.max(data, d => +d.attack)]) // default y-axis stat is attack
+        .range([height - margin.bottom, margin.top]);
+
+
+    // Append X and Y axes
+    const xAxis = d3.axisBottom(xScale).ticks(15); // Adjust tick count as needed
+    const yAxis = d3.axisLeft(yScale).ticks(15);
+
+    svg.append("g")
+        .attr("transform", `translate(0, ${height - margin.bottom})`)
+        .call(xAxis);
+    svg.append("g")
+        .attr("transform", `translate(${margin.left}, 0)`)
+        .call(yAxis);
+
+
+    // Append axis labels
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height - 10)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .text("HP");
+
+    const yAxisLabel = svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", 15)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .text("Attack");
+
+
+    // Make the circles
+    const circles = svg.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xScale(+d.hp))
+        .attr("cy", d => yScale(+d.attack))
+        .attr("r", 5)
+        .attr("fill", "blue");
+
+
+    // This would be the section for the hover action
+    const tooltip = d3.select("#tooltip");
+    circles.on("mouseover", function(event, d) {
+        tooltip.style("display", "block")
+            .style("left", event.pageX + 10 + "px")
+            .style("top", event.pageY + 10 + "px")
+            .html(`
+                <strong>${d.name}</strong><br>
+                HP: ${d.hp}<br>
+                Attack: ${d.attack}<br>
+                Defense: ${d.defense}<br>
+                Speed: ${d.speed}
+            `);
+        d3.select(this).attr("stroke", "black").attr("stroke-width", 2); //Highlight circle
+    })
+    .on("mouseout", function() {
+        tooltip.style("display", "none");
+        d3.select(this).attr("stroke", "none"); //Remove highlight
+    });
+
+
+    // This section is for when the circles are updated, along with the y-axis label
+    d3.select("#y-axis-select").on("change", function() {
+        const selectedStat = this.value;
+        yScale.domain([0, d3.max(data, d => +d[selectedStat])]);
+
+        circles.transition()
+            .duration(500)
+            .attr("cy", d => yScale(+d[selectedStat]))
+            .attr("fill", d => {
+            // Change the color based on stat type
+            if (selectedStat === "hp") return "red";
+            if (selectedStat === "attack") return "blue";
+            if (selectedStat === "defense") return "green";
+            if (selectedStat === "speed") return "purple";
+        });
+
+        yAxisLabel.text(selectedStat.charAt(0).toUpperCase() + selectedStat.slice(1));
+    });
+});
+</script>
+</body>
+</html>
