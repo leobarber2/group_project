@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Project</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="control.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- <style>
+        .heatmap 
+        {
+          font-family: 'Courier New', Courier, monospace;
+        }
+        .cell {
+          stroke : rgb(255, 255, 255)
+          stroke-width  10px;
+        }
+    </style> -->
+</head>
+<body>
+    <!-- template html file -->
+    <div class= "heatmap"></div>
+    <script>
+        // d3.csv('pokemon_competitive_analysis.csv').then(data => {
+        //     new Control(data);
+        //});
+
+        //fill-opacity
+        const data = [
+            [40, 20, 30, 10, 50],
+            [40, 10, 60, 30, 10],
+            [20, 70, 30, 80, 10],
+            [60, 20, 30, 70, 40],
+            [10, 40, 20, 60, 50]
+        ];
+        const cellSize = 50; // Size of each cell
+        const width = data[0].length * cellSize;
+        const height = data.length * cellSize;
+
+        // Create an SVG element
+        const svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // Create a color scale
+        const colorScale = d3.scaleLinear()
+            .domain([d3.min(data.flat()), d3.max(data.flat())])
+            .range(["#0000FF", "#ADD8E6"]);
+
+        // Create the heatmap
+        svg.selectAll("g")
+            .data(data)
+            .join("g")
+            .attr("transform", (d, i) => `translate(0, ${i * cellSize})`)
+            .selectAll("rect")
+            .data(row => row)
+            .join("rect")
+            .attr("x", (d, i) => i * cellSize)
+            .attr("y", 0)
+            .attr("width", cellSize)
+            .attr("height", cellSize)
+            .attr("fill", d => colorScale(d))
+            .attr("class", "cell");
+
+
+            
+
+
+    </script>
+</body>
+</html>
+
+
