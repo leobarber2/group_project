@@ -13,13 +13,14 @@
 
     <select id="y-axis-select">
         <option value="attack">Attack</option>
-        <option value="hp">HP</option>
+        <option value="sp_atk">Sp_Atk</option>
         <option value="defense">Defense</option>
+        <option value="sp_def">Sp_Def</option>
         <option value="speed">Speed</option>
     </select>
 
     <script>
-d3.csv("pokemon_competitive_analysis.csv").then(data => {
+d3.csv("pokemon_analysis_data.csv").then(data => {
     const width = 1000, height = 1000, margin = { top: 50, right: 50, bottom: 50, left: 50 };
 
     const svg = d3.select("#scatterplot-container").append("svg")
@@ -84,7 +85,9 @@ d3.csv("pokemon_competitive_analysis.csv").then(data => {
                 <strong>${d.name}</strong><br>
                 HP: ${d.hp}<br>
                 Attack: ${d.attack}<br>
+                Sp_Attack: ${d.sp_atk}<br>
                 Defense: ${d.defense}<br>
+                Sp_Defense: ${d.sp_def}<br>
                 Speed: ${d.speed}
             `);
         d3.select(this).attr("stroke", "black").attr("stroke-width", 2); //Highlight circle
@@ -105,10 +108,11 @@ d3.csv("pokemon_competitive_analysis.csv").then(data => {
             .attr("cy", d => yScale(+d[selectedStat]))
             .attr("fill", d => {
             // Change the color based on stat type
-            if (selectedStat === "hp") return "red";
             if (selectedStat === "attack") return "blue";
             if (selectedStat === "defense") return "green";
             if (selectedStat === "speed") return "purple";
+            if (selectedStat === "sp_def") return "red";
+            if (selectedStat === "sp_atk") return "orange";
         });
 
         yAxisLabel.text(selectedStat.charAt(0).toUpperCase() + selectedStat.slice(1));
