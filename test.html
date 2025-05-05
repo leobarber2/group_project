@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>D3 Heatmap Example</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .cell {
+      stroke: #fff;
+    }
+    .axis-label {
+      font-size: 12px;
+      text-anchor: middle;
+    }
+  </style>
+</head>
+<body>
+  <svg width="600" height="400"></svg>
+
+  <script>
+    // Load CSV data
+    d3.csv("pokemon_analysis_data.csv").then(function(data) {
+      // Parse data values
+      data.forEach(d => d.hp = +d.hp);
+
+      const margin = {top: 30, right: 30, bottom: 30, left: 60},
+            width = 1000 - margin.left - margin.right,
+            height = 800 - margin.top - margin.bottom;
+
+      const svg = d3.select("svg")
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      // Get unique groups and variables
+      const groups = [...new Set(data.map(d => d.type1))];
+      const variables = [...new Set(data.map(d => d.type2))];
+
+      // Scales
+      const x = d3.scaleBand()
+        .domain(variables)
+        .range([0, width])
+        .padding(0.05);
+
+      const y = d3.scaleBand()
+        .domain(groups)
+        .range([0, height])
+        .padding(0.05);
+
+      const colorScale = d3.scaleSequential()
+        .interpolator(d3.interpolateBlues)
+        .domain([0, d3.max(data, d => d.hp)]);
+
+      // Axes
+      svg.append("g")
+        .call(d3.axisTop(x).tickSize(0))
+        .selectAll("text")
+        .attr("class", "axis-label");
+
+      svg.append("g")
+        .call(d3.axisLeft(y).tickSize(0))
+        .selectAll("text")
+        .attr("class", "axis-label");
+
+      // Draw heatmap cells
+      svg.selectAll()
+        .data(data, d => d.type1 + ':' + d.type2)
+        .join("rect")
+        .attr("x", d => x(d.type1))
+        .attr("y", d => y(d.type2))
+        .attr("width", x.bandwidth())
+        .attr("height", y.bandwidth())
+        .attr("class", "cell")
+        .style("fill", d => colorScale(d.hp));
+    });
+  </script>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Project</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="control.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- <style>
+        .heatmap 
+        {
+          font-family: 'Courier New', Courier, monospace;
+        }
+        .cell {
+          stroke : rgb(255, 255, 255)
+          stroke-width  10px;
+        }
+    </style> -->
+</head>
+<body>
+    <div class= "heatmap"></div>
+    <script>
+        d3.csv('pokemon_analysis_data.csv').then(data => {
+            const width = 1000, height = 1000, margin = { top: 50, right: 50, bottom: 50, left: 50 };
+
+       });
+
+        //fill-opacity
+        const data = [
+            [40, 20, 30, 10, 50],
+            [40, 10, 60, 30, 10],
+            [20, 70, 30, 80, 10],
+            [60, 20, 30, 70, 40],
+            [10, 40, 20, 60, 50]
+        ];
+        const cellSize = 75; // Size of each cell
+        const width = data[0].length * cellSize;
+        const height = data.length * cellSize;
+
+        // Create an SVG element
+        const svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // Create a color scale
+        const colorScale = d3.scaleLinear()
+            .domain([d3.min(data.flat()), d3.max(data.flat())])
+            .range(["#0000FF", "#ADD8E6"]);
+
+        // Create the heatmap
+        svg.selectAll("g")
+            .data(data)
+            .join("g")
+            .attr("transform", (d, i) => `translate(0, ${i * cellSize})`)
+            .selectAll("rect")
+            .data(row => row)
+            .join("rect")
+            .attr("x", (d, i) => i * cellSize)
+            .attr("y", 0)
+            .attr("width", cellSize)
+            .attr("height", cellSize)
+            .attr("fill", d => colorScale(d))
+            .attr("class", "cell");
+
+
+            
+
+
+    </script>
+</body>
+</html>
